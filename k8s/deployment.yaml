@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: time-microservice-rust
+  labels:
+    app: time-microservice-rust
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: time-microservice-rust
+  template:
+    metadata:
+      labels:
+        app: time-microservice-rust
+    spec:
+      containers:
+        - name: time-microservice-rust
+          image: time-microservice-rust:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: PORT
+              value: "8080"
+            - name: TZ
+              value: "UTC"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: time-microservice-rust
+  labels:
+    app: time-microservice-rust
+spec:
+  selector:
+    app: time-microservice-rust
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  type: ClusterIP
