@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 //! time-microservice-rust: returns the current date and time for the root path.
 
-use chrono::{TimeZone, Utc};
+use chrono::Utc;
 use chrono_tz::Tz;
 use serde::{Deserialize, Serialize};
 use std::env;
